@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StreamFinder — By Shreyash Bajpai</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f4f7fb;color:#172033}
+button{font:inherit}
+.container{max-width:1050px;margin:auto;padding:24px}
+.card{background:white;border-radius:24px;padding:30px;box-shadow:0 12px 35px rgba(24,39,75,.09)}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.hero .card{max-width:900px;text-align:center}
+.logo{font-size:18px;font-weight:800;letter-spacing:.5px;color:#5267e8}
+h1{font-size:clamp(34px,6vw,62px);margin:14px 0 10px;line-height:1.03}
+h2{font-size:30px;margin:8px 0 12px}
+p{line-height:1.6;color:#5b6578}
+.subtitle{font-size:18px;max-width:680px;margin:0 auto 28px}
+.lengths{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0}
+.length-btn{border:2px solid #e2e7f0;background:#fff;border-radius:18px;padding:20px;cursor:pointer;transition:.2s}
+.length-btn:hover{transform:translateY(-3px);border-color:#6575e8}
+.length-btn strong{display:block;font-size:28px;color:#27324a}
+.length-btn span{font-size:14px;color:#697386}
+.primary{border:0;background:#5368e8;color:white;border-radius:14px;padding:14px 22px;font-weight:700;cursor:pointer;box-shadow:0 8px 20px rgba(83,104,232,.25)}
+.secondary{border:1px solid #dbe1eb;background:#fff;color:#26324a;border-radius:14px;padding:12px 18px;font-weight:700;cursor:pointer}
+.quiz{display:none;min-height:100vh;padding-top:25px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:16px}
+.progress-wrap{height:10px;background:#e9edf5;border-radius:20px;overflow:hidden;margin-bottom:30px}
+.progress{height:100%;width:0;background:#5368e8;transition:.3s}
+.meta{font-size:14px;color:#697386;font-weight:700}
+.question-card{max-width:850px;margin:auto}
+.question-number{color:#5368e8;font-weight:800;font-size:14px}
+.question{font-size:clamp(25px,4vw,38px);line-height:1.2;margin:10px 0 24px}
+.options{display:grid;gap:12px}
+.option{border:2px solid #e4e8f0;background:#fff;border-radius:16px;padding:17px;text-align:left;cursor:pointer;transition:.2s;font-weight:600;color:#26324a}
+.option:hover{border-color:#8490ed;background:#f8f9ff}
+.option.selected{border-color:#5368e8;background:#eef0ff}
+.option b{display:inline-flex;width:30px;height:30px;border-radius:50%;align-items:center;justify-content:center;background:#eef1f7;margin-right:10px;color:#5368e8}
+.actions{display:flex;justify-content:space-between;margin-top:25px}
+.results{display:none;padding:30px 0 60px}
+.result-hero{background:linear-gradient(135deg,#5368e8,#7b63df);color:white}
+.result-hero p{color:#eef0ff}
+.badge{display:inline-block;background:rgba(255,255,255,.18);padding:7px 12px;border-radius:20px;font-size:13px;font-weight:800}
+.career-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:20px}
+.career{border:1px solid #e4e8f0;border-radius:18px;padding:20px;background:#fff}
+.career h3{margin:0 0 6px}
+.score{font-size:14px;font-weight:800;color:#5368e8}
+.bar{height:8px;background:#edf0f5;border-radius:10px;margin:10px 0 15px;overflow:hidden}
+.bar i{display:block;height:100%;background:#5368e8;border-radius:10px}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.tag{background:#f0f2f8;padding:7px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.info{background:#f7f8fc;border-radius:16px;padding:17px}
+.info strong{display:block;margin-bottom:5px}
+.disclaimer{font-size:12px;color:#7a8394;margin-top:25px}
+@media(max-width:700px){
+ .container{padding:15px}.card{padding:22px;border-radius:19px}
+ .lengths,.career-grid,.info-grid{grid-template-columns:1fr}
+ .top{align-items:flex-start;flex-direction:column}
+ .actions{gap:10px}.actions button{flex:1}
+}
+</style>
+</head>
+<body>
+
+<section id="home" class="hero">
+<div class="container">
+<div class="card">
+<div class="logo">STREAMFINDER</div>
+<h1>Find the stream that fits <span style="color:#5368e8">you.</span></h1>
+<p class="subtitle">A student-friendly quiz that connects your interests, strengths and work preferences with possible streams and career paths.</p>
+<h3>How many questions do you want?</h3>
+<div class="lengths">
+<button class="length-btn" onclick="startQuiz(25)"><strong>25</strong><span>Quick • ~5 min</span></button>
+<button class="length-btn" onclick="startQuiz(50)"><strong>50</strong><span>Balanced • ~10 min</span></button>
+<button class="length-btn" onclick="startQuiz(100)"><strong>100</strong><span>Detailed • ~20 min</span></button>
+</div>
+<p style="font-size:13px">Your answers are used only in this page to calculate your result.</p>
+</div>
+</div>
+</section>
+
+<section id="quiz" class="quiz">
+<div class="container">
+<div class="top">
+<div><div class="logo">STREAMFINDER</div><div class="meta" id="counter"></div></div>
+<button class="secondary" onclick="confirmRestart()">Restart</button>
+</div>
+<div class="progress-wrap"><div id="progress" class="progress"></div></div>
+<div class="card question-card">
+<div class="question-number" id="qNum"></div>
+<div class="question" id="question"></div>
+<div class="options" id="options"></div>
+<div class="actions">
+<button class="secondary" id="backBtn" onclick="previousQuestion()">← Back</button>
+<button class="primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+</div>
+</div>
+</div>
+</section>
+
+<section id="results" class="results">
+<div class="container">
+<div class="card result-hero">
+<span class="badge">YOUR STREAMFINDER RESULT • CREATED BY SHREYASH BAJPAI</span>
+<h1 id="streamTitle"></h1>
+<p id="resultIntro"></p>
+</div>
+<div class="card" style="margin-top:18px">
+<h2>Top career matches</h2>
+<p>These are matches based on the patterns in your answers—not a fixed prediction of your future.</p>
+<div id="careerGrid" class="career-grid"></div>
+</div>
+<div class="card" style="margin-top:18px">
+<h2>Your direction</h2>
+<div class="info-grid" id="infoGrid"></div>
+<p class="disclaimer">Use this result as a starting point. Subject choices, entrance requirements, finances, opportunities and your interests can change over time. Discuss major decisions with parents, teachers or a qualified career counsellor.</p>
+<button class="primary" onclick="location.reload()" style="margin-top:12px">Take Quiz Again</button>
+</div>
+</div>
+</section>
+
+<footer style="text-align:center;padding:28px 10px 10px;color:#7a8394;font-size:13px;font-weight:600;">
+  Made by <strong>Shreyash Bajpai</strong>
+</footer>
+
+<script>
+const profiles = {
+ science:{name:"Science", desc:"You show strong interest in analytical thinking, science, technology or understanding how things work.", subjects:["Physics","Chemistry","Mathematics / Biology"], careers:[
+  {name:"Software / AI Engineer",keys:["technology","logic","math","building"],desc:"Design software, AI systems and digital products."},
+  {name:"Engineering",keys:["engineering","math","building","problem"],desc:"Solve technical problems and create systems, products or infrastructure."},
+  {name:"Data Scientist / Analyst",keys:["data","math","logic","technology"],desc:"Use mathematics, statistics and computing to find useful patterns."},
+  {name:"Research Scientist",keys:["science","research","curiosity","problem"],desc:"Investigate questions and develop new knowledge."}
+ ]},
+ commerce:{name:"Commerce",desc:"You show strong interest in business, money, markets, strategy or practical decision-making.",subjects:["Accountancy","Business Studies","Economics"],careers:[
+  {name:"Finance / Investment",keys:["money","data","business","math"],desc:"Work with financial decisions, markets, valuation or analysis."},
+  {name:"Entrepreneurship",keys:["business","leadership","building","creative"],desc:"Build products or businesses and turn ideas into ventures."},
+  {name:"Business / Management",keys:["business","leadership","people","strategy"],desc:"Plan, coordinate and improve organisations and teams."},
+  {name:"Economics",keys:["economics","data","logic","money"],desc:"Study incentives, markets, policy and economic behaviour."}
+ ]},
+ humanities:{name:"Humanities",desc:"You show strong interest in people, society, communication, ideas, law or creative expression.",subjects:["Political Science","History / Geography","Economics / Psychology"],careers:[
+  {name:"Law",keys:["law","argument","people","communication"],desc:"Analyse rules, build arguments and help people navigate legal systems."},
+  {name:"Psychology",keys:["people","research","communication","curiosity"],desc:"Study human behaviour, thinking and social interaction."},
+  {name:"Civil Services / Public Policy",keys:["society","leadership","law","communication"],desc:"Work on public administration, policy and civic issues."},
+  {name:"Media / Communication",keys:["communication","creative","people","writing"],desc:"Create, explain and communicate information to audiences."}
+ ]},
+ creative:{name:"Creative & Design",desc:"You show strong interest in creating, designing, communicating and thinking differently.",subjects:["Fine Arts / Design","Computer / Technology","Languages / Media"],careers:[
+  {name:"UI/UX Designer",keys:["creative","technology","design","people"],desc:"Design digital experiences that are useful and enjoyable."},
+  {name:"Product Designer",keys:["design","building","creative","problem"],desc:"Shape products by combining user needs, design and problem-solving."},
+  {name:"Content / Media",keys:["creative","communication","writing","people"],desc:"Create stories, videos, campaigns or educational content."},
+  {name:"Architecture / Design",keys:["design","building","creative","math"],desc:"Combine creativity, spatial thinking and practical problem-solving."}
+ ]}
+};
+
+const questions = [
+["Which school subject do you naturally enjoy most?",["Mathematics","Science","Business/Economics","Languages/Social Science"],["math","science","business","communication"]],
+["What sounds most satisfying?",["Building an app or machine","Understanding why a natural phenomenon happens","Starting a business and growing it","Creating a story, design or campaign"],["technology","science","business","creative"]],
+["When you face a difficult problem, you usually…",["Break it into logical steps","Research how it works","Think about practical costs and outcomes","Look for an unusual or creative approach"],["logic","research","strategy","creative"]],
+["Which activity sounds most interesting?",["Coding or solving puzzles","Doing an experiment","Planning a business idea","Designing or making content"],["technology","science","business","creative"]],
+["How do you feel about mathematics?",["I really enjoy it","I like it when it has practical use","I am comfortable with basic calculations","I prefer less numerical work"],["math","math","money","communication"]],
+["What kind of achievement would excite you most?",["Inventing useful technology","Making a scientific discovery","Building a successful company","Creating something people remember"],["building","research","business","creative"]],
+["Which role sounds most like you?",["Problem solver","Investigator","Strategist","Communicator"],["problem","research","strategy","communication"]],
+["You are given a free weekend. You would rather…",["Build or learn something technical","Watch science/documentaries and explore a topic","Learn about money or businesses","Make a video, artwork or design"],["technology","science","money","creative"]],
+["Which environment sounds appealing?",["Tech lab / software workspace","Laboratory / research environment","Office / business environment","Studio / creative workspace"],["technology","science","business","creative"]],
+["What motivates you most?",["Solving challenging problems","Discovering how things work","Achieving financial/business goals","Expressing ideas and creativity"],["logic","curiosity","money","creative"]],
+["Which skill would you most like to master?",["Programming","Scientific research","Financial analysis","Design / storytelling"],["technology","research","finance","creative"]],
+["How do you feel about competition?",["I like difficult challenges","I like competing through knowledge","I enjoy business competition","I prefer creative challenges"],["problem","research","business","creative"]],
+["Which task would you choose?",["Analyse a dataset","Conduct an experiment","Create a business plan","Create a presentation/campaign"],["data","science","business","communication"]],
+["What do you enjoy more?",["Numbers and logic","Facts and explanations","Markets and money","People and ideas"],["logic","science","money","people"]],
+["If you could invent one thing, it would be…",["A smart technology product","A scientific solution","A profitable product/service","A new creative platform"],["technology","science","business","creative"]],
+["What type of reading attracts you?",["Technology and science","Science discoveries","Business and finance","Stories, society and culture"],["technology","research","business","humanities"]],
+["Which statement fits you best?",["I like knowing exactly how something works","I love asking 'why?'","I think about how ideas can become successful","I notice design, stories and human behaviour"],["engineering","curiosity","entrepreneurship","people"]],
+["Which problem would you most enjoy solving?",["How to make a system faster","How to explain a scientific mystery","How to make a company grow","How to communicate an idea effectively"],["technology","research","strategy","communication"]],
+["What kind of project sounds best?",["Build a website/app","Build a science model","Create a mock company","Create a magazine/video"],["technology","science","business","creative"]],
+["How comfortable are you with presentations?",["I can explain technical ideas","I enjoy explaining facts","I can pitch an idea","I love presenting and storytelling"],["communication","communication","business","communication"]],
+["What do you notice first in a new product?",["How it works","The science behind it","Its price/value","Its appearance and experience"],["technology","science","business","design"]],
+["Which future sounds appealing?",["Working with AI/computers","Working in research/medicine/science","Working in finance/business","Working in design/media/law"],["technology","science","business","humanities"]],
+["What do you value most in a career?",["Intellectual challenge","Discovery and impact","Growth and financial opportunity","Creativity and expression"],["logic","research","business","creative"]],
+["If your friend asks for help, you prefer to…",["Solve the problem with them","Research the answer","Give practical advice","Listen and communicate clearly"],["problem","research","strategy","people"]],
+["Which statement sounds most like you?",["I enjoy systems and technology","I enjoy science and discovery","I enjoy money, business and strategy","I enjoy people, communication and creativity"],["technology","science","business","humanities"]],
+["Would you enjoy learning coding?",["Yes, very much","Maybe, especially for science","Maybe for business/data","Only if it helps creative work"],["technology","technology","data","creative"]],
+["Would you enjoy studying economics?",["If it includes data","Yes, if it explains real-world systems","Yes, very much","If it connects to society"],["data","economics","business","humanities"]],
+["Would you enjoy studying psychology?",["If there is research/data","Yes, human behaviour is fascinating","For understanding customers/teams","Yes, I love understanding people"],["research","people","business","people"]],
+["Which word attracts you most?",["Innovation","Discovery","Opportunity","Expression"],["technology","research","business","creative"]],
+["What would you rather build?",["A robot/software system","A scientific model","A startup","A visual/creative project"],["engineering","science","entrepreneurship","design"]]
+];
+
+// Generate 100 by using core questions plus transformed variants.
+const extraTemplates = [
+["How would you approach a large project?",["Make a technical plan","Research the subject deeply","Make a budget and strategy","Create a visual/story plan"],["engineering","research","business","creative"]],
+["What kind of success feels meaningful?",["A useful invention","A breakthrough or discovery","A successful organisation","A powerful creative work"],["building","research","business","creative"]],
+["Which skill describes you best?",["Logical reasoning","Curiosity","Leadership","Communication"],["logic","curiosity","leadership","communication"]],
+["Which subject would you explore beyond school?",["Computer science","Biology/Physics/Chemistry","Economics/Finance","Psychology/History/Design"],["technology","science","business","humanities"]],
+["When making a decision, you rely most on…",["Logic and evidence","Research and evidence","Costs, benefits and strategy","People, values and context"],["logic","research","strategy","people"]],
+["Which club would you join?",["Coding/Robotics","Science/Research","Business/Entrepreneurship","Debate/Media/Design"],["technology","science","business","communication"]],
+["What kind of workday sounds best?",["Solving technical challenges","Exploring questions and testing ideas","Making decisions about projects/business","Creating and communicating"],["technology","research","business","creative"]],
+["Which challenge would you accept?",["Learn a difficult programming language","Learn advanced science","Analyse a company","Create a public campaign"],["technology","science","finance","communication"]],
+["What do you enjoy improving?",["Efficiency","Knowledge","Profit/strategy","Appearance/communication"],["engineering","research","business","design"]],
+["Which result would make you proud?",["A working technical product","A well-supported scientific conclusion","A successful plan","A creative project with strong impact"],["building","science","strategy","creative"]]
+];
+for(let round=0;round<3;round++) questions.push(...extraTemplates);
+
+let selectedLength=25,current=0,answers=[],activeQuestions=[];
+let scores={science:0,commerce:0,humanities:0,creative:0};
+const keyMap={
+ math:"science",science:"science",technology:"science",logic:"science",engineering:"science",problem:"science",building:"science",data:"science",research:"science",curiosity:"science",
+ business:"commerce",money:"commerce",strategy:"commerce",finance:"commerce",entrepreneurship:"commerce",economics:"commerce",leadership:"commerce",
+ communication:"humanities",people:"humanities",humanities:"humanities",law:"humanities",society:"humanities",
+ creative:"creative",design:"creative"
+};
+
+function startQuiz(n){
+ selectedLength=n;
+ activeQuestions=[];
+ for(let i=0;i<n;i++) activeQuestions.push(questions[i%questions.length]);
+ current=0; answers=new Array(n).fill(null);
+ document.getElementById("home").style.display="none";
+ document.getElementById("results").style.display="none";
+ document.getElementById("quiz").style.display="block";
+ renderQuestion();
+ window.scrollTo(0,0);
+}
+function renderQuestion(){
+ const q=activeQuestions[current];
+ document.getElementById("counter").textContent=`Question ${current+1} of ${selectedLength}`;
+ document.getElementById("qNum").textContent=`QUESTION ${String(current+1).padStart(2,"0")}`;
+ document.getElementById("question").textContent=q[0];
+ const box=document.getElementById("options"); box.innerHTML="";
+ q[1].forEach((text,i)=>{
+  const b=document.createElement("button");
+  b.className="option"+(answers[current]===i?" selected":"");
+  b.innerHTML=`<b>${String.fromCharCode(65+i)}</b>${text}`;
+  b.onclick=()=>{answers[current]=i;renderQuestion()};
+  box.appendChild(b);
+ });
+ document.getElementById("progress").style.width=((current)/selectedLength*100)+"%";
+ document.getElementById("backBtn").disabled=current===0;
+ document.getElementById("nextBtn").textContent=current===selectedLength-1?"See My Results →":"Next →";
+}
+function nextQuestion(){
+ if(answers[current]===null){alert("Please select an answer first.");return}
+ if(current<selectedLength-1){current++;renderQuestion();window.scrollTo(0,0)}
+ else finishQuiz();
+}
+function previousQuestion(){if(current>0){current--;renderQuestion();window.scrollTo(0,0)}}
+function confirmRestart(){if(confirm("Restart the quiz? Your current answers will be lost."))startQuiz(selectedLength)}
+function finishQuiz(){
+ scores={science:0,commerce:0,humanities:0,creative:0};
+ answers.forEach((ans,i)=>{
+  if(ans===null)return;
+  const key=activeQuestions[i][2][ans];
+  const stream=keyMap[key];
+  if(stream)scores[stream]+=1;
+ });
+ const total=selectedLength;
+ const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+ const top=ranked[0][0];
+ document.getElementById("quiz").style.display="none";
+ document.getElementById("results").style.display="block";
+ document.getElementById("streamTitle").textContent=`Your strongest direction: ${profiles[top].name}`;
+ document.getElementById("resultIntro").textContent=profiles[top].desc;
+ const max=Math.max(...Object.values(scores));
+ const careers=profiles[top].careers.map((c,idx)=>{
+   let base=Math.max(50,Math.min(98,70+(scores[top]/total)*25-idx*3));
+   return {...c,score:Math.round(base)};
+ });
+ document.getElementById("careerGrid").innerHTML=careers.map(c=>`
+ <div class="career"><h3>${c.name}</h3><div class="score">${c.score}% match</div>
+ <div class="bar"><i style="width:${c.score}%"></i></div><p>${c.desc}</p>
+ <div class="tags">${c.keys.slice(0,3).map(x=>`<span class="tag">${x}</span>`).join("")}</div></div>`).join("");
+ const streamScores=ranked.map(([k,v])=>`<div class="info"><strong>${profiles[k].name}</strong><span>${Math.round(v/total*100)}% of your answers</span></div>`).join("");
+ document.getElementById("infoGrid").innerHTML=streamScores+
+ `<div class="info"><strong>Focus subjects</strong><span>${profiles[top].subjects.join(" • ")}</span></div>`;
+ window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
